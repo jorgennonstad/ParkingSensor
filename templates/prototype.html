@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Grid Status</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+        font-family: 'Arial', sans-serif;
+        color: #333;
+        background-color: #414d60;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+        background-image: url('./images/wood_wallpaper.png'); /* Replace with your image URL */
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+    
+    /* Other styles remain the same */
+    .container {
+        /* Optional: add a background color or transparency if needed */
+        padding: 20px;
+    }
+
+        h1 {
+            margin-top: 20px;
+            color: #007BFF;
+        }
+        h2 {
+            color: #333;
+            margin: 20px 0;
+        }
+        .grid {
+            display: flex;
+            justify-content: center; /* Center the grid horizontally */
+            margin: 20px auto; /* Center the grid vertically */
+            max-width: 640px; /* Limit the width of the grid */
+        }
+        .square {
+            width: 150px; /* Width for each square */
+            height: 150px; /* Height for each square */
+            border: 2px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px; /* Bigger font size */
+            margin: 10px; /* Spacing between squares */
+            border-radius: 8px; /* Rounded corners */
+            transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+            cursor: pointer; /* Pointer cursor on hover */
+        }
+        .square:hover {
+            transform: scale(1.05); /* Slightly increase size on hover */
+        }
+        .taken {
+            fill: #dc3545; /* Red for taken spots */
+            color: white;
+        }
+        .open {
+            fill: #28a745; /* Green for open spots */
+            color: white;
+        }
+        #video-feed {
+            margin-top: 20px;
+            max-width: 640px; /* Maximum width for the video feed */
+            max-height: 480px; /* Maximum width for the video feed */
+            margin-left: auto;
+            margin-right: auto;
+            display: none;
+        }
+        img {
+            width: 100%; /* Full width for responsive design */
+            border: 2px solid #ccc; /* Border around the video feed */
+            border-radius: 8px; /* Rounded corners for video feed */
+        }
+        #spot-count {
+            position: absolute;
+            top: 24%;
+            font-size: 25px;
+            left: 45%;
+        }
+
+        #parking-map{
+            position: absolute;
+            height: 100vh;
+            width: 100%;
+            left: 0;
+            z-index: -1;
+        }
+    </style>
+    
+</head>
+<body>
+    <?xml version="1.0" encoding="UTF-8"?>
+<svg id="parking-map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920.5 960.25">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #414d60;
+      }
+
+      .cls-2 {
+        fill: #fff;
+      }
+
+
+      .cls-4 {
+        fill: #235556;
+      }
+
+      .cls-5 {
+        fill: #566c8c;
+      }
+
+      .cls-6, .cls-7 {
+        fill: #333b4d;
+      }
+
+      .cls-7 {
+        font-family: MyriadPro-Regular, 'Myriad Pro';
+        font-size: 127.1px;
+      }
+    </style>
+  </defs>
+  <rect id="background" class="cls-1" width="1920.5" height="960.25"/>
+  <g id="parking-spots">
+    <rect id="square-5" x="1177.23" y="399.05" width="114.4" height="145.46"/>
+    <rect id="square-4" x="1036.74" y="399.05" width="114.4" height="145.46"/>
+    <rect id="square-3" x="897.75" y="399.05" width="114.4" height="145.46"/>
+    <rect id="square-2" x="758.75" y="399.05" width="114.4" height="145.46"/>
+    <rect id="square-1" x="618.27" y="399.05" width="114.4" height="145.46"/>
+  </g>
+  <polygon id="grass" class="cls-4" points="1146.79 0 1136.61 239.13 1070.85 242.85 837.7 256.06 529.82 273.5 274.25 378.12 250.01 0 1146.79 0"/>
+  <g id="road">
+    <rect id="road-k" class="cls-6" x="1817.38" y=".75" width="50.81" height="155.43"/>
+    <polygon id="road-g" class="cls-6" points="1277.1 0 1277.1 367.66 499.93 367.66 319.09 472.28 319.09 959.5 271.26 959.5 271.26 472.28 499.93 319.83 1220.3 319.83 1220.3 0 1277.1 0"/>
+  </g>
+  <g id="buildings">
+    <polygon id="building-gak" class="cls-5" points="1920.5 376.63 1920.5 960.25 1576.01 960.25 1576.01 827.98 1333.89 827.98 1333.89 914.67 586.61 914.67 586.61 566.44 1333.89 566.44 1333.89 659.1 1576.01 659.1 1576.01 376.63 1665.68 376.63 1665.68 236.14 1333.89 236.14 1333.89 0 1779.26 0 1779.26 376.63 1920.5 376.63"/>
+    <rect id="building-b" class="cls-5" width="172.62" height="472.28"/>
+  </g>
+  <g id="building-indicator">
+    <text class="cls-7" transform="translate(907.75 783.6)"><tspan x="0" y="0">G</tspan></text>
+    <text class="cls-7" transform="translate(1519.65 132.83)"><tspan x="0" y="0">K</tspan></text>
+  </g>
+  <path id="parking-indicator" class="cls-2" d="M1037.71,327.31l-59.53,1.49-23.91,23.91-23.95-23.91-59.49-1.49c-18.3,0-33.13-14.83-33.13-33.13v-104.11c0-18.3,14.83-33.13,33.13-33.13h166.89c18.3,0,33.13,14.83,33.13,33.13v104.11c0,18.3-14.83,33.13-33.13,33.13Z"/>
+</svg>
+    <div class="container">
+
+        <!-- 
+            
+            <h1>Parking Grid Status</h1>
+            <div class="grid">
+                <div id="square-1" class="square">Square 1</div>
+                <div id="square-2" class="square">Square 2</div>
+                <div id="square-3" class="square">Square 3</div>
+                <div id="square-4" class="square">Square 4</div>
+                <div id="square-5" class="square">Square 5</div>
+            </div>
+        -->
+            
+            <!-- Live video feed from the camera -->
+        <div id="video-feed">
+            <h2>Live Camera Feed</h2>
+            <img src="{{ url_for('video_feed') }}" alt="Live Video Feed"/>
+        </div>
+        
+        <!-- Parking spot counter -->
+        <div id="spot-count">0/5 spots taken</div>
+        
+    </div>
+
+    <script>
+        function updateStatus() {
+            $.getJSON('/status', function(data) {
+                let takenCount = 0;
+                for (let i = 1; i <= 5; i++) {
+                    let square = $('#parking-map #square-' + i); // Select the SVG element by ID
+                    if (data[i]) {
+                        square.removeClass('open').addClass('taken'); // Add "taken" class if occupied
+                        takenCount++;
+                    } else {
+                        square.removeClass('taken').addClass('open'); // Add "open" class if available
+                    }
+                }
+                
+                // Update the spot counter
+                $('#spot-count').text(takenCount + '/5 spots taken');
+            });
+        }
+        
+        setInterval(updateStatus, 1000); // Update every second
+    </script>
+    
+</body>
+</html>

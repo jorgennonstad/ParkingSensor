@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Grid Status</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            margin-top: 20px;
+            color: #007BFF;
+        }
+        h2 {
+            color: #333;
+            margin: 20px 0;
+        }
+        .grid {
+            display: flex;
+            justify-content: center; /* Center the grid horizontally */
+            margin: 20px auto; /* Center the grid vertically */
+            max-width: 640px; /* Limit the width of the grid */
+        }
+        .square {
+            width: 150px; /* Width for each square */
+            height: 150px; /* Height for each square */
+            border: 2px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px; /* Bigger font size */
+            margin: 10px; /* Spacing between squares */
+            border-radius: 8px; /* Rounded corners */
+            transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+            cursor: pointer; /* Pointer cursor on hover */
+        }
+        .square:hover {
+            transform: scale(1.05); /* Slightly increase size on hover */
+        }
+        .taken {
+            background-color: #dc3545; /* Red for taken */
+            color: white;
+        }
+        .open {
+            background-color: #28a745; /* Green for open */
+            color: white;
+        }
+        #video-feed {
+            margin-top: 20px;
+            max-width: 640px; /* Maximum width for the video feed */
+            max-height: 480px; /* Maximum width for the video feed */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        img {
+            width: 100%; /* Full width for responsive design */
+            border: 2px solid #ccc; /* Border around the video feed */
+            border-radius: 8px; /* Rounded corners for video feed */
+        }
+        #spot-count {
+            font-size: 20px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Parking Grid Status</h1>
+    <div class="grid">
+        <div id="square-1" class="square">Square 1</div>
+        <div id="square-2" class="square">Square 2</div>
+        <div id="square-3" class="square">Square 3</div>
+        <div id="square-4" class="square">Square 4</div>
+        <div id="square-5" class="square">Square 5</div>
+    </div>
+
+    <!-- Live video feed from the camera -->
+    <div id="video-feed">
+        <h2>Live Camera Feed</h2>
+        <img src="{{ url_for('video_feed') }}" alt="Live Video Feed"/>
+    </div>
+
+    <!-- Parking spot counter -->
+    <div id="spot-count">0/5 spots taken</div>
+
+    <script>
+        function updateStatus() {
+            $.getJSON('/status', function(data) {
+                let takenCount = 0;
+                for (let i = 1; i <= 5; i++) {
+                    let square = $('#square-' + i);
+                    if (data[i]) {
+                        square.removeClass('open').addClass('taken');
+                        square.text('Square ' + i + ': Taken');
+                        takenCount++;
+                    } else {
+                        square.removeClass('taken').addClass('open');
+                        square.text('Square ' + i + ': Open');
+                    }
+                }
+
+                // Update the spot counter
+                $('#spot-count').text(takenCount + '/5 spots taken');
+            });
+        }
+
+        setInterval(updateStatus, 1000); // Update every second
+    </script>
+</body>
+</html>
