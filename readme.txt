@@ -18,9 +18,3 @@ This project utilizes a live camera feed and object detection to monitor parking
 - **Parking Spots**: The camera feed is divided into 5 predefined parking spots, and the system tracks car occupancy in each.
 - **Data Storage**: The parking status (occupied or free) is sent to ThingSpeak via its API.
 - **Live Updates**: A website fetches real-time data from ThingSpeak and displays the current parking space status.
-
-## Installation:
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd <project-folder>
